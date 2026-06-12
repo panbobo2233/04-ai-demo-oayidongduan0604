@@ -210,7 +210,7 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
 
       {/* 滚动内容区：统计栏 + AI推荐 + 置顶Tab+筛选 + 卡片列表 */}
       <div className="flex-1 overflow-y-auto">
-        {/* 统计栏 */}
+        {/* 统计栏 - 暂时隐藏 *
         <div className="bg-white px-4 py-4 flex justify-between text-center rounded-b-2xl shadow-sm mb-3">
           <div className="flex-1">
             <div className="text-gray-500 text-sm mb-1">待处理</div>
@@ -227,8 +227,9 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
             <div className="text-3xl font-bold text-red-500">2</div>
           </div>
         </div>
+        */}
 
-        {/* AI 推荐 */}
+        {/* AI 推荐 - 暂时隐藏 *
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl mx-4 p-4 shadow-sm mb-4">
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center text-blue-700 font-medium text-[14px]">
@@ -262,6 +263,7 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
             ))}
           </div>
         </div>
+        */}
 
         {/* 标签页 + 筛选（合并为一个 sticky 块） */}
         <div className="sticky top-0 z-10 bg-white shadow-sm">
@@ -358,6 +360,7 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
                         {task.extraInfo.value}
                       </div>
                     )}
+                    {/* AI 摘要 - 暂时隐藏 *
                     <div className="bg-blue-50/50 rounded-lg p-2.5 flex justify-between items-center mt-2 border border-blue-50">
                       <p className="text-xs text-gray-500 flex-1 mr-2">
                         <span className="text-indigo-400 mr-1">⭐ AI 摘要：</span>{task.aiSummary}
@@ -365,6 +368,15 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
                       <button
                         onClick={() => onDetail(task.id)}
                         className="text-blue-500 text-sm font-medium shrink-0"
+                      >
+                        处理 &gt;
+                      </button>
+                    </div>
+                    */}
+                    <div className="flex justify-end mt-2">
+                      <button
+                        onClick={() => onDetail(task.id)}
+                        className="text-blue-500 text-sm font-medium"
                       >
                         处理 &gt;
                       </button>

@@ -77,19 +77,29 @@ const MessageList: React.FC<MessageListProps> = ({ onNavigate }) => {
         <div className="text-gray-400 font-bold text-lg">@</div>
         <div className="text-gray-400 text-lg">★</div>
         <div className="text-gray-400 text-lg">🕒</div>
+        <button
+          onClick={() => onNavigate(Page.APPROVAL_CENTER)}
+          className="flex items-center space-x-1 text-gray-400 relative ml-auto rounded-full px-2 py-1 transition-colors active:bg-gray-200"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <span className="text-sm font-medium">待办</span>
+          <span className="bg-[#FF3B30] text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">18</span>
+        </button>
       </div>
 
-      {/* Pinned Items */}
+      {/* Pinned Items - 暂时隐藏 */}
+      {/*
       <div className="bg-[#F8F8F8]">
         {pinnedItems.map((item) => (
-          <div 
-            key={item.id} 
+          <div
+            key={item.id}
             onClick={() => onNavigate(item.id === 'work_notice' ? Page.WORK_NOTICE : Page.OFFICE_ASSISTANT)}
             className="flex px-4 py-3 items-center active:bg-gray-100 transition-colors border-b border-white/50 relative"
           >
-            {/* Pinned Badge (Obvious corner triangle) - Changed color to be more prominent */}
             <div className="absolute top-0 right-0 w-0 h-0 border-t-[14px] border-t-gray-300 border-l-[14px] border-l-transparent"></div>
-            
+
             <div className="relative">
               {renderAvatar(item)}
               {item.unreadCount && (
@@ -108,6 +118,7 @@ const MessageList: React.FC<MessageListProps> = ({ onNavigate }) => {
           </div>
         ))}
       </div>
+      */}
 
       {/* Normal Items */}
       <div className="flex-1">
