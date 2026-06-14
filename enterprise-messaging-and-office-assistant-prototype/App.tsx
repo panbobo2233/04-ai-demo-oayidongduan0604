@@ -5,6 +5,8 @@ import WorkNoticeDetail from './components/WorkNoticeDetail';
 import OfficeAssistantDetail from './components/OfficeAssistantDetail';
 import ApprovalDetailPage from './components/ApprovalDetailPage';
 import ApprovalCenter from './components/ApprovalCenter';
+import BatchApproval from './components/BatchApproval';
+import InitiateRequest from './components/InitiateRequest';
 import NotificationSettings from './components/NotificationSettings';
 import AppCircle from './components/AppCircle';
 import BottomNav from './components/BottomNav';
@@ -48,10 +50,24 @@ const App: React.FC = () => {
         return <NotificationSettings onBack={() => setCurrentPage(Page.OFFICE_ASSISTANT)} />;
       case Page.APPROVAL_CENTER:
         return (
-          <ApprovalCenter 
+          <ApprovalCenter
             initialSystem={initialSystemFilter}
-            onBack={() => setCurrentPage(Page.OFFICE_ASSISTANT)} 
+            onBack={() => setCurrentPage(Page.MESSAGE_LIST)}
             onDetail={taskId => navigateTo(Page.APPROVAL_DETAIL, taskId)}
+            onBatchApproval={() => setCurrentPage(Page.BATCH_APPROVAL)}
+            onInitiateRequest={() => setCurrentPage(Page.INITIATE_REQUEST)}
+          />
+        );
+      case Page.BATCH_APPROVAL:
+        return (
+          <BatchApproval
+            onBack={() => setCurrentPage(Page.APPROVAL_CENTER)}
+          />
+        );
+      case Page.INITIATE_REQUEST:
+        return (
+          <InitiateRequest
+            onBack={() => setCurrentPage(Page.APPROVAL_CENTER)}
           />
         );
       case Page.APPROVAL_DETAIL:
