@@ -5,7 +5,7 @@ interface ApprovalCenterProps {
   initialSystem?: string;
   onBack: () => void;
   onDetail: (id: string) => void;
-  onBatchApproval: () => void;
+  onBatchApproval: (tab: string) => void;
   onInitiateRequest: () => void;
 }
 
@@ -25,6 +25,8 @@ interface TaskItem {
   applicant: string;
   time: string;
   aiSummary: string;
+  tabCategory?: '待处理' | '待阅' | '已处理' | '我发起';
+  readStatus?: '待查阅' | '已查阅';
   extraInfo?: { label: string; value: string } | null;
 }
 
@@ -36,10 +38,11 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
   const [drawerCategory, setDrawerCategory] = useState('全部');
   const [drawerSubType, setDrawerSubType] = useState<string | null>(null);
   const [activeSubType, setActiveSubType] = useState<string | null>(null);
+  const [readFilter, setReadFilter] = useState<'全部' | '待查阅' | '已查阅'>('待查阅');
+  const [showReadPicker, setShowReadPicker] = useState(false);
 
   // 高级筛选项状态
   const [advType, setAdvType] = useState('全部');
-  const [advStatus, setAdvStatus] = useState('全部');
   const [advTime, setAdvTime] = useState('全部');
   const [advDept, setAdvDept] = useState('全部');
   const [advUrgent, setAdvUrgent] = useState('全部');
@@ -193,7 +196,48 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
       title: 'XX 集团利率定价偏离申请',
       source: '来源：CRM 系统', department: '公司业务部', applicant: '陈飞',
       time: '昨天', aiSummary: '贷款金额 5000 万，申请下浮 20BP，超授权范围。',
-      extraInfo: null,
+      tabCategory: '待处理', extraInfo: null,
+    },
+    // ===== 待阅任务 =====
+    {
+      id: 'read_task_1',
+      category: '公文', subType: '发文', isUrgent: false,
+      status: '', statusColor: '',
+      iconColor: 'text-blue-500',
+      title: '关于印发2024年第一季度考核结果的通知',
+      source: '来源：公文系统', department: '人力资源部', applicant: '陈芳',
+      time: '06-10', aiSummary: '考核结果已发布，请查阅确认。',
+      tabCategory: '待阅', readStatus: '待查阅', extraInfo: null,
+    },
+    {
+      id: 'read_task_2',
+      category: '公文', subType: '收文', isUrgent: true,
+      status: '紧急', statusColor: 'text-red-500 bg-red-50',
+      iconColor: 'text-red-500',
+      title: '市金融局关于报送年度经营数据的紧急通知',
+      source: '来源：公文系统', department: '合规部', applicant: '王磊',
+      time: '06-13', aiSummary: '需在6月20日前完成数据报送。',
+      tabCategory: '待阅', readStatus: '待查阅', extraInfo: null,
+    },
+    {
+      id: 'read_task_3',
+      category: '流程', subType: '用车申请', isUrgent: false,
+      status: '', statusColor: '',
+      iconColor: 'text-orange-500',
+      title: '刘伟提交的因公外出用车申请',
+      source: '来源：OA 办公', department: '运营管理部', applicant: '刘伟',
+      time: '06-09', aiSummary: '用车已结束，请阅知。',
+      tabCategory: '待阅', readStatus: '已查阅', extraInfo: null,
+    },
+    {
+      id: 'read_task_4',
+      category: '公文', subType: '签报', isUrgent: false,
+      status: '', statusColor: '',
+      iconColor: 'text-blue-500',
+      title: '关于办公区域装修改造的签报请示',
+      source: '来源：公文系统', department: '行政部', applicant: '杨洋',
+      time: '06-08', aiSummary: '装修改造方案已审批通过。',
+      tabCategory: '待阅', readStatus: '已查阅', extraInfo: null,
     },
   ];
 
@@ -215,12 +259,16 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
   ];
 
   const filteredTasks = allTasks.filter(task => {
-    // 系统过滤：若选中的是某个已注册系统，只保留该系统的子类型任务
+    // Tab 过滤：有 tabCategory 的任务只在匹配 tab 下显示
+    if (task.tabCategory && task.tabCategory !== activeTab) return false;
+    // 系统过滤
     if (activeFilter !== '全部') {
       const sysSubTypes = systemCategories[activeFilter];
       if (sysSubTypes && sysSubTypes.length > 0 && !sysSubTypes.includes(task.subType)) return false;
     }
     if (activeSubType && task.subType !== activeSubType) return false;
+    // 待阅子筛选
+    if (activeTab === '待阅' && readFilter !== '全部' && task.readStatus !== readFilter) return false;
     return true;
   });
 
@@ -231,7 +279,6 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
 
   const resetAdvancedFilter = () => {
     setAdvType('全部');
-    setAdvStatus('全部');
     setAdvTime('全部');
     setAdvDept('全部');
     setAdvUrgent('全部');
@@ -384,7 +431,7 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
             {tabs.map(tab => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => { setActiveTab(tab); setReadFilter('待查阅'); }}
                 className={`pb-2 text-[14px] transition-colors ${
                   activeTab === tab
                     ? 'text-blue-500 font-medium border-b-2 border-blue-500'
@@ -398,7 +445,7 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
 
           {/* 分类筛选 */}
           <div className="flex items-center px-4 py-3">
-            <div className="flex overflow-x-auto space-x-2 no-scrollbar flex-1 min-w-0">
+            <div className="flex space-x-2 flex-1 min-w-0">
               <button
                 onClick={() => {
                   setDrawerCategory(activeFilter);
@@ -416,22 +463,61 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </button>
-              <button
-                onClick={() => setShowAdvancedFilter(true)}
-                className={`px-4 py-1.5 rounded-full text-sm shrink-0 flex items-center transition-colors ${
-                  appliedAdvFilter
-                    ? 'border border-blue-500 text-blue-500 bg-blue-50'
-                    : 'bg-gray-100 text-gray-600'
-                }`}
-              >
-                筛选
-                <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
+              {activeTab === '待阅' ? (
+                <div className="relative shrink-0">
+                  <button
+                    onClick={() => setShowReadPicker(!showReadPicker)}
+                    className={`px-4 py-1.5 rounded-full text-sm flex items-center transition-colors ${
+                      readFilter !== '全部'
+                        ? 'border border-blue-500 text-blue-500 bg-blue-50'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {readFilter === '待查阅' ? '仅查看待查阅' : readFilter}
+                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                  {showReadPicker && (
+                    <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-[100] min-w-[90px]">
+                      {([
+                        { label: '全部', value: '全部' },
+                        { label: '仅查看待查阅', value: '待查阅' },
+                        { label: '已阅', value: '已阅' },
+                      ]).map(f => (
+                        <button
+                          key={f.value}
+                          onClick={() => { setReadFilter(f.value as '全部' | '待查阅' | '已阅'); setShowReadPicker(false); }}
+                          className={`w-full text-left px-3 py-2 text-sm transition-colors whitespace-nowrap ${
+                            readFilter === f.value
+                              ? 'text-blue-500 bg-blue-50 font-medium'
+                              : 'text-gray-600'
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowAdvancedFilter(true)}
+                  className={`px-4 py-1.5 rounded-full text-sm shrink-0 flex items-center transition-colors ${
+                    appliedAdvFilter
+                      ? 'border border-blue-500 text-blue-500 bg-blue-50'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  筛选
+                  <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+              )}
             </div>
             <button
-              onClick={onBatchApproval}
+              onClick={() => onBatchApproval(activeTab)}
               className="p-1.5 rounded-full bg-blue-500 text-white shrink-0 flex items-center justify-center ml-3"
               title="批量处理"
             >
@@ -470,7 +556,15 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
                         )}
                         <h3 className="font-medium text-sm text-gray-900 truncate">{task.title}</h3>
                       </div>
-                      <span className="text-[11px] text-gray-400 shrink-0 ml-1">{task.time}</span>
+                      <div className="flex items-center gap-1 shrink-0 ml-1">
+                        {task.readStatus === '已查阅' && (
+                          <span className="text-[10px] text-gray-400 bg-gray-100 px-1 py-0 rounded">已阅</span>
+                        )}
+                        {task.readStatus === '待查阅' && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
+                        )}
+                        <span className="text-[11px] text-gray-400">{task.time}</span>
+                      </div>
                     </div>
 
                     {/* 第二行：类型标签 + 部门 · 申请人 */}
@@ -643,13 +737,6 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
                 {selectOption(
                   [{ label: '全部', value: '全部' }, { label: '公文', value: '公文' }, { label: '流程', value: '流程' }, { label: '业务', value: '业务' }],
                   advType, setAdvType
-                )}
-              </div>
-              <div>
-                <h3 className="text-[14px] font-bold text-[#1A1A1A] mb-3">状态</h3>
-                {selectOption(
-                  [{ label: '全部', value: '全部' }, { label: '待处理', value: '待处理' }, { label: '待阅', value: '待阅' }, { label: '已处理', value: '已处理' }],
-                  advStatus, setAdvStatus
                 )}
               </div>
               <div>

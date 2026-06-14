@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.MESSAGE_LIST);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [initialSystemFilter, setInitialSystemFilter] = useState<string>('全部');
+  const [batchMode, setBatchMode] = useState<'approval' | 'read'>('approval');
 
   const navigateTo = (page: Page, taskId?: string) => {
     setCurrentPage(page);
@@ -54,7 +55,10 @@ const App: React.FC = () => {
             initialSystem={initialSystemFilter}
             onBack={() => setCurrentPage(Page.MESSAGE_LIST)}
             onDetail={taskId => navigateTo(Page.APPROVAL_DETAIL, taskId)}
-            onBatchApproval={() => setCurrentPage(Page.BATCH_APPROVAL)}
+            onBatchApproval={(tab) => {
+              setBatchMode(tab === '待阅' ? 'read' : 'approval');
+              setCurrentPage(Page.BATCH_APPROVAL);
+            }}
             onInitiateRequest={() => setCurrentPage(Page.INITIATE_REQUEST)}
           />
         );
@@ -62,6 +66,7 @@ const App: React.FC = () => {
         return (
           <BatchApproval
             onBack={() => setCurrentPage(Page.APPROVAL_CENTER)}
+            mode={batchMode}
           />
         );
       case Page.INITIATE_REQUEST:

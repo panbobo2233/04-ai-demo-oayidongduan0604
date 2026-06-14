@@ -3,6 +3,7 @@ import { ChevronLeft, Check, X, Ban, CheckCheck, Undo2 } from 'lucide-react';
 
 interface BatchApprovalProps {
   onBack: () => void;
+  mode?: 'approval' | 'read';
 }
 
 interface TaskItem {
@@ -150,9 +151,9 @@ const allTasks: TaskItem[] = [
   },
 ];
 
-const BatchApproval: React.FC<BatchApprovalProps> = ({ onBack }) => {
+const BatchApproval: React.FC<BatchApprovalProps> = ({ onBack, mode = 'approval' }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [showConfirm, setShowConfirm] = useState<'agree' | 'reject' | null>(null);
+  const [showConfirm, setShowConfirm] = useState<'agree' | 'reject' | 'read' | null>(null);
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedIds);
@@ -195,6 +196,16 @@ const BatchApproval: React.FC<BatchApprovalProps> = ({ onBack }) => {
       setShowConfirm(null);
     } else {
       setShowConfirm('reject');
+    }
+  };
+
+  const handleBatchRead = () => {
+    if (showConfirm === 'read') {
+      alert(`已标记 ${selectedIds.size} 项为已阅`);
+      setSelectedIds(new Set());
+      setShowConfirm(null);
+    } else {
+      setShowConfirm('read');
     }
   };
 
@@ -310,7 +321,9 @@ const BatchApproval: React.FC<BatchApprovalProps> = ({ onBack }) => {
               /* 二次确认状态 */
               <div className="px-4 py-3 space-y-3">
                 <div className="text-center text-sm text-gray-600">
-                  {showConfirm === 'agree' ? (
+                  {showConfirm === 'read' ? (
+                    <span>确认对选中的 <span className="font-bold text-blue-600">{selectedIds.size}</span> 项任务标记<b className="text-blue-600">已阅</b>？</span>
+                  ) : showConfirm === 'agree' ? (
                     <span>确认对选中的 <span className="font-bold text-blue-600">{selectedIds.size}</span> 项任务执行<b className="text-green-600">同意</b>？</span>
                   ) : (
                     <span>确认对选中的 <span className="font-bold text-blue-600">{selectedIds.size}</span> 项任务执行<b className="text-red-500">退回</b>？</span>
@@ -325,18 +338,36 @@ const BatchApproval: React.FC<BatchApprovalProps> = ({ onBack }) => {
                     <span>取消操作</span>
                   </button>
                   <button
-                    onClick={showConfirm === 'agree' ? handleBatchAgree : handleBatchReject}
+                    onClick={showConfirm === 'read' ? handleBatchRead : showConfirm === 'agree' ? handleBatchAgree : handleBatchReject}
                     className={`flex-1 py-3 rounded-xl text-white font-bold flex items-center justify-center space-x-1.5 active:opacity-80 ${
-                      showConfirm === 'agree' ? 'bg-green-500' : 'bg-[#FF3B30]'
+                      showConfirm === 'read' ? 'bg-blue-500' : showConfirm === 'agree' ? 'bg-green-500' : 'bg-[#FF3B30]'
                     }`}
                   >
                     <CheckCheck size={18} />
-                    <span>{showConfirm === 'agree' ? '确认同意' : '确认退回'}</span>
+                    <span>{showConfirm === 'read' ? '确认已阅' : showConfirm === 'agree' ? '确认同意' : '确认退回'}</span>
                   </button>
                 </div>
               </div>
+            ) : mode === 'read' ? (
+              /* 待阅模式：取消 + 批量已阅 */
+              <div className="flex space-x-3 px-4 py-3">
+                <button
+                  onClick={cancelAction}
+                  className="flex-1 py-3 border border-gray-200 rounded-xl text-gray-500 font-medium flex items-center justify-center space-x-1.5 active:bg-gray-50"
+                >
+                  <Ban size={18} />
+                  <span>取消</span>
+                </button>
+                <button
+                  onClick={handleBatchRead}
+                  className="flex-[2] py-3 bg-blue-500 rounded-xl text-white font-bold flex items-center justify-center space-x-1.5 shadow-md active:bg-blue-600"
+                >
+                  <CheckCheck size={18} />
+                  <span>批量已阅</span>
+                </button>
+              </div>
             ) : (
-              /* 正常选择状态：三项操作 */
+              /* 审批模式：取消 + 同意 + 退回 */
               <div className="flex space-x-3 px-4 py-3">
                 <button
                   onClick={cancelAction}
