@@ -431,7 +431,7 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
         */}
 
         {/* 标签页 + 筛选（sticky 块，滚动后变白） */}
-        <div className={`sticky top-0 z-10 transition-colors duration-200 ${isScrolled ? 'bg-white shadow-sm' : ''}`}>
+        <div className={`sticky top-0 z-10 transition-colors duration-200 pb-2 ${isScrolled ? 'bg-white shadow-sm' : ''}`}>
           {/* 标签页切换 */}
           <div className="flex justify-around px-4 pt-2 border-b border-gray-100">
             {tabs.map(tab => {
@@ -574,8 +574,9 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
           </div>
         </div>
 
+        <div className="h-4" />
         {/* 任务卡片列表 */}
-        <div className="px-4 py-3 space-y-4 pb-24">
+        <div className="px-4 pb-24 space-y-3">
           {displayTasks.length === 0 ? (
             <div className="text-center text-gray-400 text-sm py-12">暂无匹配的任务</div>
           ) : (
