@@ -377,7 +377,7 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
       {/* 滚动内容区 */}
       <div className="flex-1 overflow-y-auto" ref={scrollRef} onScroll={handleScroll}>
         {/* 统计栏 */}
-        <div className="bg-white rounded-2xl mx-4 mt-4 px-4 py-4 flex justify-between text-center shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl mx-4 mt-4 mb-5 px-4 py-4 flex justify-between text-center shadow-sm border border-gray-100">
           <div className="flex-1">
             <div className="text-gray-500 text-sm mb-1">待处理</div>
             <div className="text-3xl font-bold text-blue-500">{allTasks.filter(t => !t.tabCategory || t.tabCategory === '待处理').length}</div>
