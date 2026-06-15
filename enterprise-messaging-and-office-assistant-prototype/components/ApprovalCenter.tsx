@@ -17,7 +17,6 @@ interface TaskItem {
   isUrgent: boolean;
   status: string;
   statusColor: string;
-  iconBg: string;
   iconColor: string;
   title: string;
   source: string;
@@ -369,24 +368,23 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
 
       {/* 滚动内容区：统计栏 + AI推荐 + 置顶Tab+筛选 + 卡片列表 */}
       <div className="flex-1 overflow-y-auto">
-        {/* 统计栏 - 暂时隐藏 *
+        {/* 统计栏 */}
         <div className="bg-white px-4 py-4 flex justify-between text-center rounded-b-2xl shadow-sm mb-3">
           <div className="flex-1">
             <div className="text-gray-500 text-sm mb-1">待处理</div>
-            <div className="text-3xl font-bold text-blue-500">18</div>
+            <div className="text-3xl font-bold text-blue-500">{allTasks.filter(t => !t.tabCategory || t.tabCategory === '待处理').length}</div>
           </div>
           <div className="w-px bg-gray-100 my-2"></div>
           <div className="flex-1">
             <div className="text-gray-500 text-sm mb-1">待阅</div>
-            <div className="text-3xl font-bold text-orange-400">5</div>
+            <div className="text-3xl font-bold text-orange-400">{allTasks.filter(t => t.tabCategory === '待阅').length}</div>
           </div>
           <div className="w-px bg-gray-100 my-2"></div>
           <div className="flex-1">
             <div className="text-gray-500 text-sm mb-1">超时</div>
-            <div className="text-3xl font-bold text-red-500">2</div>
+            <div className="text-3xl font-bold text-red-500">{allTasks.filter(t => t.isUrgent).length}</div>
           </div>
         </div>
-        */}
 
         {/* AI 推荐 - 暂时隐藏 *
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl mx-4 p-4 shadow-sm mb-4">
@@ -428,19 +426,37 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
         <div className="sticky top-0 z-10 bg-white shadow-sm">
           {/* 标签页切换 */}
           <div className="flex justify-around px-4 pt-2 border-b border-gray-100">
-            {tabs.map(tab => (
-              <button
-                key={tab}
-                onClick={() => { setActiveTab(tab); setReadFilter('待查阅'); }}
-                className={`pb-2 text-[14px] transition-colors ${
-                  activeTab === tab
-                    ? 'text-blue-500 font-medium border-b-2 border-blue-500'
-                    : 'text-gray-500'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+            {tabs.map(tab => {
+              const count = tab === '待处理'
+                ? allTasks.filter(t => !t.tabCategory || t.tabCategory === '待处理').length
+                : tab === '待阅'
+                ? allTasks.filter(t => t.tabCategory === '待阅').length
+                : tab === '已处理'
+                ? allTasks.filter(t => t.tabCategory === '已处理').length
+                : allTasks.filter(t => t.tabCategory === '我发起').length;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => { setActiveTab(tab); setReadFilter('待查阅'); }}
+                  className={`pb-2 text-[14px] transition-colors relative ${
+                    activeTab === tab
+                      ? 'text-blue-500 font-medium border-b-2 border-blue-500'
+                      : 'text-gray-500'
+                  }`}
+                >
+                  {tab}
+                  {count > 0 && (
+                    <span className={`absolute -top-0.5 -right-4 min-w-[16px] h-[16px] rounded-full text-[10px] font-bold flex items-center justify-center px-1 ${
+                      activeTab === tab
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-300 text-white'
+                    }`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* 分类筛选 */}

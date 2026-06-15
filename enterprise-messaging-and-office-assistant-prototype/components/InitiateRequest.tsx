@@ -9,21 +9,21 @@ interface EntryItem {
   id: string;
   label: string;
   icon: React.ReactNode;
-  color: string;
-  bgColor: string;
+  gradient: string;
+  shadow: string;
 }
 
-const iconMap: Record<string, { icon: React.ReactNode; color: string; bgColor: string }> = {
-  '收文':           { icon: <FileDown size={20} />,    color: 'text-blue-600',   bgColor: 'bg-blue-50' },
-  '发文':           { icon: <FileUp size={20} />,      color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
-  '签报':           { icon: <FileCheck size={20} />,   color: 'text-red-500',    bgColor: 'bg-red-50' },
-  '联系函':         { icon: <Mail size={20} />,        color: 'text-teal-600',   bgColor: 'bg-teal-50' },
-  '国内休假':       { icon: <Umbrella size={20} />,    color: 'text-green-600',  bgColor: 'bg-green-50' },
-  '用车申请':       { icon: <Car size={20} />,         color: 'text-amber-600',  bgColor: 'bg-amber-50' },
-  '出差申请':       { icon: <Plane size={20} />,       color: 'text-sky-600',    bgColor: 'bg-sky-50' },
-  '出国境申请':     { icon: <Globe size={20} />,       color: 'text-purple-600', bgColor: 'bg-purple-50' },
-  '数据查询修改申请': { icon: <Database size={20} />,   color: 'text-cyan-600',   bgColor: 'bg-cyan-50' },
-  '系统需求申请':   { icon: <MonitorCog size={20} />,  color: 'text-rose-600',   bgColor: 'bg-rose-50' },
+const iconMap: Record<string, { icon: React.ReactNode; gradient: string; shadow: string }> = {
+  '收文':           { icon: <FileDown size={22} />,    gradient: 'bg-gradient-to-br from-blue-400 to-blue-600',   shadow: 'shadow-[0_4px_12px_rgba(59,130,246,0.4)]' },
+  '发文':           { icon: <FileUp size={22} />,      gradient: 'bg-gradient-to-br from-indigo-400 to-indigo-600', shadow: 'shadow-[0_4px_12px_rgba(99,102,241,0.4)]' },
+  '签报':           { icon: <FileCheck size={22} />,   gradient: 'bg-gradient-to-br from-red-400 to-red-600',    shadow: 'shadow-[0_4px_12px_rgba(248,113,113,0.4)]' },
+  '联系函':         { icon: <Mail size={22} />,        gradient: 'bg-gradient-to-br from-teal-400 to-teal-600',   shadow: 'shadow-[0_4px_12px_rgba(45,212,191,0.4)]' },
+  '国内休假':       { icon: <Umbrella size={22} />,    gradient: 'bg-gradient-to-br from-green-400 to-green-600',  shadow: 'shadow-[0_4px_12px_rgba(74,222,128,0.4)]' },
+  '用车申请':       { icon: <Car size={22} />,         gradient: 'bg-gradient-to-br from-amber-400 to-amber-600',  shadow: 'shadow-[0_4px_12px_rgba(251,191,36,0.4)]' },
+  '出差申请':       { icon: <Plane size={22} />,       gradient: 'bg-gradient-to-br from-sky-400 to-sky-600',    shadow: 'shadow-[0_4px_12px_rgba(56,189,248,0.4)]' },
+  '出国境申请':     { icon: <Globe size={22} />,       gradient: 'bg-gradient-to-br from-purple-400 to-purple-600', shadow: 'shadow-[0_4px_12px_rgba(168,85,247,0.4)]' },
+  '数据查询修改申请': { icon: <Database size={22} />,   gradient: 'bg-gradient-to-br from-cyan-400 to-cyan-600',   shadow: 'shadow-[0_4px_12px_rgba(34,211,238,0.4)]' },
+  '系统需求申请':   { icon: <MonitorCog size={22} />,  gradient: 'bg-gradient-to-br from-rose-400 to-rose-600',   shadow: 'shadow-[0_4px_12px_rgba(251,113,133,0.4)]' },
 };
 
 const sections: { title: string; items: string[] }[] = [
@@ -51,8 +51,8 @@ const makeEntry = (label: string): EntryItem => {
     id: label,
     label,
     icon: meta.icon,
-    color: meta.color,
-    bgColor: meta.bgColor,
+    gradient: meta.gradient,
+    shadow: meta.shadow,
   };
 };
 
@@ -124,17 +124,17 @@ const InitiateRequest: React.FC<InitiateRequestProps> = ({ onBack }) => {
               </div>
 
               {/* 入口网格 4列 */}
-              <div className="grid grid-cols-4 gap-2.5 px-4 pb-4">
+              <div className="grid grid-cols-4 gap-y-4 gap-x-2 px-4 pb-4">
                 {section.items.map(label => {
                   const entry = makeEntry(label);
                   return (
                     <button
                       key={`${section.title}-${entry.id}`}
                       onClick={() => handleEntryClick(entry.label)}
-                      className="flex flex-col items-center py-2.5 px-1 bg-white rounded-xl shadow-sm border border-gray-100 active:bg-gray-50 transition-colors"
+                      className="flex flex-col items-center py-1 active:opacity-70 transition-opacity"
                     >
-                      <div className={`w-10 h-10 rounded-xl ${entry.bgColor} flex items-center justify-center mb-1.5`}>
-                        <span className={entry.color}>{entry.icon}</span>
+                      <div className={`w-12 h-12 rounded-2xl ${entry.gradient} ${entry.shadow} flex items-center justify-center mb-2 text-white`}>
+                        {entry.icon}
                       </div>
                       <span className="text-[11px] text-gray-700 text-center leading-tight">
                         {entry.label}
