@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, Search, Plus, ListChecks, X } from 'lucide-react';
 
 interface ApprovalCenterProps {
@@ -46,6 +46,14 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
   const [advDept, setAdvDept] = useState('全部');
   const [advUrgent, setAdvUrgent] = useState('全部');
   const [appliedAdvFilter, setAppliedAdvFilter] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = useCallback(() => {
+    if (scrollRef.current) {
+      setIsScrolled(scrollRef.current.scrollTop > 10);
+    }
+  }, []);
 
   useEffect(() => {
     if (initialSystem !== '全部') {
@@ -366,23 +374,23 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
         </button>
       </header>
 
-      {/* 滚动内容区：统计栏 + AI推荐 + 置顶Tab+筛选 + 卡片列表 */}
-      <div className="flex-1 overflow-y-auto">
+      {/* 滚动内容区 */}
+      <div className="flex-1 overflow-y-auto" ref={scrollRef} onScroll={handleScroll}>
         {/* 统计栏 */}
-        <div className="bg-white px-4 py-4 flex justify-between text-center rounded-b-2xl shadow-sm mb-3">
+        <div className="bg-white rounded-2xl mx-4 mt-4 px-4 py-4 flex justify-between text-center shadow-sm border border-gray-100">
           <div className="flex-1">
             <div className="text-gray-500 text-sm mb-1">待处理</div>
             <div className="text-3xl font-bold text-blue-500">{allTasks.filter(t => !t.tabCategory || t.tabCategory === '待处理').length}</div>
           </div>
           <div className="w-px bg-gray-100 my-2"></div>
           <div className="flex-1">
-            <div className="text-gray-500 text-sm mb-1">待阅</div>
-            <div className="text-3xl font-bold text-orange-400">{allTasks.filter(t => t.tabCategory === '待阅').length}</div>
+            <div className="text-gray-500 text-sm mb-1">紧急</div>
+            <div className="text-3xl font-bold text-orange-400">{allTasks.filter(t => t.isUrgent).length}</div>
           </div>
           <div className="w-px bg-gray-100 my-2"></div>
           <div className="flex-1">
-            <div className="text-gray-500 text-sm mb-1">超时</div>
-            <div className="text-3xl font-bold text-red-500">{allTasks.filter(t => t.isUrgent).length}</div>
+            <div className="text-gray-500 text-sm mb-1">待阅</div>
+            <div className="text-3xl font-bold text-red-500">{allTasks.filter(t => t.tabCategory === '待阅').length}</div>
           </div>
         </div>
 
@@ -422,8 +430,8 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
         </div>
         */}
 
-        {/* 标签页 + 筛选（合并为一个 sticky 块） */}
-        <div className="sticky top-0 z-10 bg-white shadow-sm">
+        {/* 标签页 + 筛选（sticky 块，滚动后变白） */}
+        <div className={`sticky top-0 z-10 transition-colors duration-200 ${isScrolled ? 'bg-white shadow-sm' : ''}`}>
           {/* 标签页切换 */}
           <div className="flex justify-around px-4 pt-2 border-b border-gray-100">
             {tabs.map(tab => {
@@ -531,6 +539,30 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
                   </svg>
                 </button>
               )}
+              {/* 只看OA 快捷切换 */}
+              <button
+                onClick={() => {
+                  if (activeFilter === 'OA系统') {
+                    setActiveFilter('全部');
+                    setActiveSubType(null);
+                  } else {
+                    setActiveFilter('OA系统');
+                    setActiveSubType(null);
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-full text-sm shrink-0 flex items-center transition-colors ${
+                  activeFilter === 'OA系统'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-500'
+                }`}
+              >
+                {activeFilter === 'OA系统' && (
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+                只看OA
+              </button>
             </div>
             <button
               onClick={() => onBatchApproval(activeTab)}
