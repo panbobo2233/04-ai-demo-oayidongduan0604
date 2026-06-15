@@ -574,7 +574,6 @@ const ApprovalCenter: React.FC<ApprovalCenterProps> = ({ initialSystem = '全部
           </div>
         </div>
 
-        <div className="h-4" />
         {/* 任务卡片列表 */}
         <div className="px-4 pb-24 space-y-3">
           {displayTasks.length === 0 ? (
